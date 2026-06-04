@@ -1,10 +1,10 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import articles from '../assets/article-content'; 
+import articles from '../assets/article-content';
 
 const ArticlePage = () => {
   const { articleId } = useParams();
-  const article = articles.find(a => a.name === articleId);
+  const article = articles.find((a) => a.name === articleId);
 
   // If article path name doesn't match your array data, render the structured 404 blocks
   if (!article) {
