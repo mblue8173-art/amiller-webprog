@@ -1,6 +1,6 @@
-import Button from '../components/Button';
-import ArticleList from '../components/ArticleList';
-import articles from '../assets/article-content';
+import Button from '../../components/Button';
+import ArticleList from '../../components/ArticleList';
+import articles from '../../assets/article-content';
 
 const ArticleListPage = () => {
   return (
@@ -13,10 +13,12 @@ const ArticleListPage = () => {
           Most talked Article about animated films
         </h1>
         <p className="mt-4 max-w-lg text-sm leading-7 text-zinc-600 sm:text-base">
-          Take a look back to some of the favorite article with some fun facts.
+          Take a look back at some of the favorite articles with fun facts and high-level summaries.
         </p>
         <div className="mt-6">
-          <Button to="/">Back Home</Button>
+          <Button to="/" variant="primary">
+            Back Home
+          </Button>
         </div>
       </section>
 
@@ -34,4 +36,4 @@ const ArticleListPage = () => {
   );
 };
 
-export default ArticleListPage
+export default ArticleListPage;
