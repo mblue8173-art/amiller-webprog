@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, Legend } from 'recharts';
@@ -19,16 +20,25 @@ const pieData = [
 const COLORS = ['#1976d2', '#ffb300', '#d32f2f'];
 
 const ReportsPage = () => {
+  const handlePrint = () => window.print();
+
   return (
     <Box sx={{ display: 'grid', gap: 3 }}>
       <Paper sx={{ p: 3 }}>
-        <Typography variant="overline" display="block" gutterBottom>
-          Reports
-        </Typography>
-        <Typography variant="h4">Monthly overview</Typography>
-        <Typography color="text.secondary" sx={{ mt: 1 }}>
-          A high-level summary of the latest report metrics and key outcomes.
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
+          <Box>
+            <Typography variant="overline" display="block" gutterBottom>
+              Reports
+            </Typography>
+            <Typography variant="h4">Monthly overview</Typography>
+            <Typography color="text.secondary" sx={{ mt: 1 }}>
+              A high-level summary of the latest report metrics and key outcomes.
+            </Typography>
+          </Box>
+          <Button variant="contained" onClick={handlePrint} sx={{ alignSelf: 'center' }}>
+            Print Report
+          </Button>
+        </Box>
         <Box sx={{ display: 'grid', gap: 2, mt: 3, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
           {[
             { label: 'Page Views', value: '1.2K' },
