@@ -1,4 +1,4 @@
-import { Link, useLocation, Outlet } from 'react-router-dom';
+import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,7 +15,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import PeopleIcon from '@mui/icons-material/People';
-import { useState } from 'react';
+import ArticleIcon from '@mui/icons-material/Article';
+import { useState, useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 
 const drawerWidth = 260;
 
@@ -23,11 +25,19 @@ const menuItems = [
   { label: 'Overview', to: '/dashboard', icon: <DashboardIcon /> },
   { label: 'Reports', to: '/dashboard/reports', icon: <BarChartIcon /> },
   { label: 'Users', to: '/dashboard/users', icon: <PeopleIcon /> },
+  { label: 'Articles', to: '/dashboard/articles', icon: <ArticleIcon /> },
 ];
 
 const DashLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen((prev) => !prev);
@@ -77,7 +87,7 @@ const DashLayout = () => {
             <Typography component="span" sx={{ mr: 2 }}>
               Search...
             </Typography>
-            <Box component="button" sx={{ border: '1px solid white', borderRadius: 1, bgcolor: 'white', color: '#1976d2', px: 1.5, py: 0.5 }}>
+            <Box component="button" onClick={handleLogout} sx={{ border: '1px solid white', borderRadius: 1, bgcolor: 'white', color: '#1976d2', px: 1.5, py: 0.5, cursor: 'pointer' }}>
               Logout
             </Box>
           </Box>

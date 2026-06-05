@@ -14,8 +14,10 @@ import DashLayout from './components/layouts/DashLayout';
 import DashboardPage from './pages/DashboardPages/DashboardPage';
 import ReportsPage from './pages/DashboardPages/ReportsPage';
 import UsersPage from './pages/DashboardPages/UsersPage';
+import DashArticleListPage from './pages/DashboardPages/DashArticleListPage';
 
 import NotFoundPage from './pages/NotFoundPage';
+import { AuthProvider } from './context/AuthContext';
 
 const routes = [
   {
@@ -73,6 +75,10 @@ const routes = [
         path: 'users',
         element: <UsersPage />,
       },
+      {
+        path: 'articles',
+        element: <DashArticleListPage />,
+      },
     ],
   },
 ];
@@ -80,7 +86,11 @@ const routes = [
 const router = createBrowserRouter(routes);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }
 
 export default App;

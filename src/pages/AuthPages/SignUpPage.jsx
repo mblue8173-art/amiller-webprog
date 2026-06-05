@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../components/Button';
+import { AuthContext } from '../../context/AuthContext';
+import { registerUser } from '../../services/api';
 
 const inputClasses =
   'mt-2 w-full rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-900 focus:bg-zinc-50';
@@ -30,6 +32,9 @@ const initialErrors = {
 const SignUpPage = () => {
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState(initialErrors);
+  const [loading, setLoading] = useState(false);
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validateContact = (value) => /^\d{11}$/.test(value);
@@ -40,7 +45,7 @@ const SignUpPage = () => {
     setErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const nextErrors = { ...initialErrors };
 
@@ -60,8 +65,24 @@ const SignUpPage = () => {
     setErrors(nextErrors);
 
     if (Object.values(nextErrors).every((error) => !error)) {
-      alert('Account created successfully!');
-      setForm(initialForm);
+      setLoading(true);
+      try {
+        const data = await registerUser({
+          firstName: form.firstName,
+          lastName: form.lastName,
+          username: form.username,
+          email: form.email,
+          password: form.password,
+          contactNumber: form.contactNumber,
+          age: parseInt(form.age),
+        });
+        login(data.user, data.token);
+        navigate('/dashboard');
+      } catch (error) {
+        setErrors((prev) => ({ ...prev, email: error.message }));
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -192,8 +213,8 @@ const SignUpPage = () => {
           </div>
         </div>
 
-        <Button type="submit" variant="primary" className={actionButtonClassName}>
-          Create Account
+        <Button type="submit" variant="primary" className={actionButtonClassName} disabled={loading}>
+          {loading ? 'Creating Account...' : 'Create Account'}
         </Button>
 
         <div className="grid gap-3 pt-2 sm:grid-cols-2">

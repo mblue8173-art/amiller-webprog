@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useContext, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -13,8 +13,10 @@ import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
 import { DataGrid } from '@mui/x-data-grid';
-import usersData from '../../data/users';
+import { AuthContext } from '../../context/AuthContext';
+import { getUsers, createUser } from '../../services/api';
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 90 },
@@ -63,22 +65,55 @@ const initialErrors = {
 };
 
 const UsersPage = () => {
+  const { user, token } = useContext(AuthContext);
   const [query, setQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [open, setOpen] = useState(false);
   const [newUser, setNewUser] = useState(initialNewUser);
   const [errors, setErrors] = useState(initialErrors);
-  const [rows, setRows] = useState(
-    usersData.map((user) => ({
-      id: user.id,
-      name: `${user.firstName} ${user.lastName}`,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      status: user.status,
-    }))
-  );
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
+
+  // Check if user is Editor - deny access
+  useEffect(() => {
+    if (user && user.role === 'Editor') {
+      setAccessDenied(true);
+    } else {
+      loadUsers();
+    }
+  }, [user, token]);
+
+  const loadUsers = async () => {
+    try {
+      const userData = await getUsers(token);
+      setRows(
+        userData.map((u) => ({
+          id: u._id,
+          name: `${u.firstName} ${u.lastName}`,
+          username: u.username,
+          email: u.email,
+          role: u.role,
+          status: u.status,
+        }))
+      );
+    } catch (error) {
+      console.error('Error loading users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (accessDenied) {
+    return (
+      <Paper sx={{ p: 3 }}>
+        <Alert severity="error">
+          Access Denied: Only Admins and Publishers can view the Users page. Editors do not have access.
+        </Alert>
+      </Paper>
+    );
+  }
 
   const filteredRows = useMemo(
     () =>
@@ -120,23 +155,41 @@ const UsersPage = () => {
     setNewUser((prev) => ({ ...prev, [field]: event.target.value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!validate()) return;
 
-    const id = rows.length + 1;
-    setRows((prev) => [
-      ...prev,
-      {
-        id,
-        name: `${newUser.firstName.trim()} ${newUser.lastName.trim()}`,
-        username: newUser.username.trim(),
-        email: newUser.email.trim(),
-        role: newUser.role,
-        status: newUser.status,
-      },
-    ]);
-    handleClose();
+    try {
+      const userData = await createUser(
+        {
+          firstName: newUser.firstName.trim(),
+          lastName: newUser.lastName.trim(),
+          username: newUser.username.trim(),
+          email: newUser.email.trim(),
+          password: Math.random().toString(36).slice(-8), // Temporary password
+          role: newUser.role,
+          status: newUser.status,
+          age: parseInt(newUser.age),
+          contactNumber: newUser.contactNumber.trim(),
+        },
+        token
+      );
+
+      setRows((prev) => [
+        ...prev,
+        {
+          id: userData.user.id,
+          name: `${newUser.firstName.trim()} ${newUser.lastName.trim()}`,
+          username: newUser.username.trim(),
+          email: newUser.email.trim(),
+          role: newUser.role,
+          status: newUser.status,
+        },
+      ]);
+      handleClose();
+    } catch (error) {
+      setErrors((prev) => ({ ...prev, email: error.message }));
+    }
   };
 
   return (
