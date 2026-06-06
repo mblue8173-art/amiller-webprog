@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "amiller-client/package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } },
+    { "src": "username-server/api/**/*.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "username-server/api/index.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}

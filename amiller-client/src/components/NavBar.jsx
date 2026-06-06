@@ -5,6 +5,7 @@ const links = [
   { label: 'Home', to: '/' },
   { label: 'About', to: '/about' },
   { label: 'Articles', to: '/articles' },
+  { label: 'Dashboard', to: '/dashboard' },
 ];
 
 const navLinkClassName = ({ isActive }) =>
@@ -40,6 +41,16 @@ const NavBar = () => {
               className={navLinkClassName}
             >
               {link.label}
+          
+          {/* Auth Controls */}
+          <div className="hidden items-center gap-3 md:flex">
+            <NavLink to="/auth/signin" className="text-sm font-medium text-white hover:underline">
+              Sign In
+            </NavLink>
+            <NavLink to="/auth/signup" className="rounded-full bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#0b3d91]">
+              Sign Up
+            </NavLink>
+          </div>
             </NavLink>
           ))}
         </nav>
